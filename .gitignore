@@ -48,3 +48,6 @@ tracker.sqlite3
 
 drizzle
 uploads/
+
+failed-covers.json
+mangakakalot*.csv
