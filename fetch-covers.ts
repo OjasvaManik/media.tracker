@@ -39,20 +39,32 @@ async function searchMangaDex( title: string, retries = 3 ): Promise<string | nu
   return null;
 }
 
-async function uploadCover( imageUrl: string, id: string, type: string, title: string ) {
-  const imgRes = await fetch( imageUrl );
-  if ( !imgRes.ok ) return false;
-  const blob = await imgRes.blob();
+async function uploadCover( imageUrl: string, id: string, type: string, title: string, retries = 3 ): Promise<boolean> {
+  for ( let i = 0; i < retries; i++ ) {
+    try {
+      const imgRes = await fetch( imageUrl );
+      if ( !imgRes.ok ) return false;
+      const blob = await imgRes.blob();
 
-  const ext = imageUrl.split( "." ).pop()?.split( "?" )[ 0 ] ?? "jpg";
-  const formData = new FormData();
-  formData.append( "file", new File( [ blob ], `cover.${ ext }`, { type: blob.type } ) );
-  formData.append( "id", id );
-  formData.append( "type", type );
-  formData.append( "title", title );
+      const ext = imageUrl.split( "." ).pop()?.split( "?" )[ 0 ] ?? "jpg";
+      const formData = new FormData();
+      formData.append( "file", new File( [ blob ], `cover.${ ext }`, { type: blob.type } ) );
+      formData.append( "id", id );
+      formData.append( "type", type );
+      formData.append( "title", title );
 
-  const res = await fetch( UPLOAD_URL, { method: "POST", body: formData } );
-  return res.ok;
+      const res = await fetch( UPLOAD_URL, { method: "POST", body: formData } );
+      return res.ok;
+    } catch ( err ) {
+      if ( i < retries - 1 ) {
+        console.log( `Retrying upload for "${ title }" (attempt ${ i + 2 })...` );
+        await sleep( 1000 * ( i + 1 ) );
+      } else {
+        throw err;
+      }
+    }
+  }
+  return false;
 }
 
 async function main() {
