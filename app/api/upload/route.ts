@@ -17,14 +17,15 @@ export async function POST( req: NextRequest ) {
       return NextResponse.json( { error: "Missing required fields" }, { status: 400 } );
     }
 
+    const baseUploadDir = "/var/www/media.tracker";
+
     const existingMedia = await db.select( { cover: media.cover } )
       .from( media )
       .where( eq( media.id, id ) )
       .limit( 1 );
 
     if ( existingMedia.length > 0 && existingMedia[ 0 ].cover ) {
-      // cover is stored as /uploads/manga/filename.jpg — strip leading slash to get the relative path
-      const oldFilePath = path.join( process.cwd(), existingMedia[ 0 ].cover.replace( /^\//, "" ) );
+      const oldFilePath = path.join( baseUploadDir, existingMedia[ 0 ].cover.replace( /^\//, "" ) );
       try {
         await fs.unlink( oldFilePath );
       } catch ( err: any ) {
@@ -39,9 +40,8 @@ export async function POST( req: NextRequest ) {
     const timestamp = Date.now();
     const fileName = `${ type }-${ safeTitle }-${ id }-${ timestamp }${ extension }`;
 
-    // store in uploads/{type}/ instead of public/{type}/
     const relativePath = `/uploads/${ type }/${ fileName }`;
-    const absoluteDirectory = path.join( process.cwd(), "uploads", type );
+    const absoluteDirectory = path.join( baseUploadDir, "uploads", type );
     const absolutePath = path.join( absoluteDirectory, fileName );
 
     await fs.mkdir( absoluteDirectory, { recursive: true } );
