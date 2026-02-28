@@ -26,9 +26,9 @@ export const MediaDrawer = ( {
         if ( !open ) onClose()
       } }
     >
-      <DrawerContent className="max-h-[90vh]">
-        <div className="mx-auto w-full max-w-5xl">
-          <DrawerHeader className="px-6 pt-6 pb-0">
+      <DrawerContent className="max-h-[90vh] flex flex-col">
+        <div className="mx-auto w-full max-w-5xl flex flex-col h-full overflow-hidden">
+          <DrawerHeader className="px-4 md:px-6 pt-6 pb-0 shrink-0">
             <DrawerTitle className="sr-only">Edit { editData?.title }</DrawerTitle>
           </DrawerHeader>
 

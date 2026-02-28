@@ -1,11 +1,11 @@
 import React from 'react'
 import MediaGrid from "@/components/media-grid";
 
-const MangaPage = () => {
+const GamesPage = () => {
   return (
     <div className={ 'pt-4' }>
-      <MediaGrid type={ 'manga' }/>
+      <MediaGrid type={ 'game' }/>
     </div>
   )
 }
-export default MangaPage
+export default GamesPage

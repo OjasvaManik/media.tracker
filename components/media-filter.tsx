@@ -35,7 +35,6 @@ export const MediaFilter = () => {
   const handleSortChange = ( val: string ) => {
     const params = new URLSearchParams( searchParams.toString() )
 
-    // Format: "sortBy_dir"
     const [ field, dir ] = val.split( '_' )
     params.set( "sortBy", field )
     params.set( "sortDir", dir.toUpperCase() )
@@ -46,14 +45,15 @@ export const MediaFilter = () => {
   return (
     <div className='flex gap-2 mb-6'>
       <Select onValueChange={ handleFilterChange } defaultValue={ searchParams.get( 'filter' ) || 'all' }>
-        <SelectTrigger className='w-[180px] shadow-sm'>
+        <SelectTrigger className='w-48 shadow-sm'>
           <HugeiconsIcon icon={ FilterHorizontalIcon } className="size-4 mr-2"/>
           <SelectValue placeholder='Status'/>
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="z-999">
           <SelectGroup>
             <SelectLabel>Status</SelectLabel>
             <SelectItem value="all">All Items</SelectItem>
+            <SelectItem value="favorites">Favorites</SelectItem>
             <SelectItem value="reading">Reading/Watching</SelectItem>
             <SelectItem value="finished">Finished</SelectItem>
             <SelectItem value="on_hold">On Hold</SelectItem>
@@ -62,12 +62,19 @@ export const MediaFilter = () => {
         </SelectContent>
       </Select>
 
-      <Select onValueChange={ handleSortChange } defaultValue="updatedAt_desc">
-        <SelectTrigger className='w-[180px] shadow-sm'>
+      <Select onValueChange={ handleSortChange } defaultValue="title_asc">
+        <SelectTrigger className='w-48 shadow-sm'>
           <HugeiconsIcon icon={ Sorting05Icon } className="size-4 mr-2"/>
           <SelectValue placeholder='Sort'/>
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="z-999">
+          <SelectGroup>
+            <SelectLabel>Alphabetical</SelectLabel>
+            <SelectItem value="title_asc"><HugeiconsIcon icon={ SortingAZ02Icon } className="inline size-3 mr-1"/> A → Z</SelectItem>
+            <SelectItem value="title_desc"><HugeiconsIcon icon={ SortingZA01Icon } className="inline size-3 mr-1"/> Z →
+              A</SelectItem>
+          </SelectGroup>
+          <SelectSeparator/>
           <SelectGroup>
             <SelectLabel>Date</SelectLabel>
             <SelectItem value="updatedAt_desc"><HugeiconsIcon icon={ Clock01Icon }
@@ -77,13 +84,6 @@ export const MediaFilter = () => {
                                                               className="inline size-3 mr-1"/> Newly Added</SelectItem>
             <SelectItem value="createdAt_asc"><HugeiconsIcon icon={ Calendar02Icon }
                                                              className="inline size-3 mr-1"/> Oldest Added</SelectItem>
-          </SelectGroup>
-          <SelectSeparator/>
-          <SelectGroup>
-            <SelectLabel>Alphabetical</SelectLabel>
-            <SelectItem value="title_asc"><HugeiconsIcon icon={ SortingAZ02Icon } className="inline size-3 mr-1"/> A → Z</SelectItem>
-            <SelectItem value="title_desc"><HugeiconsIcon icon={ SortingZA01Icon } className="inline size-3 mr-1"/> Z →
-              A</SelectItem>
           </SelectGroup>
         </SelectContent>
       </Select>

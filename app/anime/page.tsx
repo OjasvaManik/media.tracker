@@ -3,7 +3,9 @@ import MediaGrid from "@/components/media-grid";
 
 const AnimePage = () => {
   return (
-    <MediaGrid type={ 'anime' }/>
+    <div className={ 'pt-4' }>
+      <MediaGrid type={ 'anime' }/>
+    </div>
   )
 }
 export default AnimePage

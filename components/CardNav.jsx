@@ -6,6 +6,7 @@ import {GoArrowUpRight} from 'react-icons/go';
 import './CardNav.css';
 import Link from "next/link";
 import {Button} from "@/components/ui/button";
+import {MediaSearchDialog} from "@/components/media-search-dialog"; // Import the dialog
 
 const CardNav = ({
                      logo,
@@ -20,6 +21,11 @@ const CardNav = ({
                  }) => {
     const [isHamburgerOpen, setIsHamburgerOpen] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
+
+    // Search State
+    const [searchOpen, setSearchOpen] = useState(false);
+    const [searchType, setSearchType] = useState('all');
+
     const navRef = useRef(null);
     const cardsRef = useRef([]);
     const tlRef = useRef(null);
@@ -130,9 +136,25 @@ const CardNav = ({
         }
     };
 
+    const closeMenu = () => {
+        if (!isExpanded) return;
+        const tl = tlRef.current;
+        if (!tl) return;
+
+        setIsHamburgerOpen(false);
+        tl.eventCallback('onReverseComplete', () => setIsExpanded(false));
+        tl.reverse();
+    };
+
     const setCardRef = i => el => {
         if (el) cardsRef.current[i] = el;
     };
+
+    const openSearch = (type) => {
+        setSearchType(type.toLowerCase());
+        setSearchOpen(true);
+        closeMenu();
+    }
 
     return (
         <div className={`card-nav-container ${className}`}>
@@ -151,7 +173,7 @@ const CardNav = ({
                     </div>
 
                     <div className="logo-container">
-                        <Link href={'/'}>
+                        <Link href={'/'} onClick={closeMenu}>
                             <img src={logo} alt={logoAlt} className="logo"/>
                         </Link>
                     </div>
@@ -160,8 +182,9 @@ const CardNav = ({
                         type="button"
                         className="card-nav-cta-button uppercase"
                         style={{backgroundColor: buttonBgColor, color: buttonTextColor}}
+                        asChild
                     >
-                        <Link href={'/add'}>
+                        <Link href={'/add'} onClick={closeMenu}>
                             Add Title
                         </Link>
                     </Button>
@@ -171,24 +194,63 @@ const CardNav = ({
                     {(items || []).slice(0, 3).map((item, idx) => (
                         <div
                             key={`${item.label}-${idx}`}
-                            className="nav-card bg-linear-to-r from-background to-background/80"
+                            className="nav-card relative overflow-hidden"
                             ref={setCardRef(idx)}
-                            style={{backgroundColor: item.bgColor, color: item.textColor}}
+                            style={{
+                                backgroundColor: item.bgColor || '#000',
+                                color: item.textColor || '#fff',
+                                backgroundImage: item.bgImage ? `url(${item.bgImage})` : 'none',
+                                backgroundSize: 'cover',
+                                backgroundPosition: 'center',
+                            }}
                         >
-                            <div className="nav-card-label">{item.label}</div>
-                            <div className="nav-card-links">
-                                {item.links?.map((lnk, i) => (
-                                    <Link key={`${lnk.label}-${i}`} className="nav-card-link" href={lnk.href}
-                                          aria-label={lnk.ariaLabel}>
-                                        <GoArrowUpRight className="nav-card-link-icon" aria-hidden="true"/>
-                                        {lnk.label}
-                                    </Link>
-                                ))}
+                            {item.bgImage && (
+                                <div className="absolute inset-0 bg-black/50 z-0 pointer-events-none"/>
+                            )}
+
+                            <div className="nav-card-label relative z-10">{item.label}</div>
+                            <div className="nav-card-links relative z-10">
+                                {item.links?.map((lnk, i) => {
+                                    // Check if the link is meant for search
+                                    if (lnk.href.includes('search')) {
+                                        return (
+                                            <button
+                                                key={`${lnk.label}-${i}`}
+                                                className="nav-card-link text-left w-full flex items-center bg-transparent border-none p-0 cursor-pointer text-[inherit] font-[inherit]"
+                                                onClick={() => openSearch(item.label)}
+                                                aria-label={lnk.ariaLabel}
+                                            >
+                                                <GoArrowUpRight className="nav-card-link-icon" aria-hidden="true"/>
+                                                {lnk.label}
+                                            </button>
+                                        )
+                                    }
+
+                                    return (
+                                        <Link
+                                            key={`${lnk.label}-${i}`}
+                                            className="nav-card-link"
+                                            href={lnk.href}
+                                            onClick={closeMenu}
+                                            aria-label={lnk.ariaLabel}
+                                        >
+                                            <GoArrowUpRight className="nav-card-link-icon" aria-hidden="true"/>
+                                            {lnk.label}
+                                        </Link>
+                                    )
+                                })}
                             </div>
                         </div>
                     ))}
                 </div>
             </nav>
+
+            {/* Render the search dialog alongside the Nav */}
+            <MediaSearchDialog
+                open={searchOpen}
+                setOpen={setSearchOpen}
+                defaultType={searchType}
+            />
         </div>
     );
 };

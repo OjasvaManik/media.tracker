@@ -15,6 +15,7 @@ import { Link01Icon, Note01Icon, TextIcon } from "@hugeicons/core-free-icons"
 import { addMediaEntry } from "@/actions/action.media"
 import { Button } from "@/components/ui/button"
 import { z } from "zod"
+import { toast } from "sonner";
 
 const mediaSchema = z.object( {
   type: z.enum( [ "manga", "anime", "game" ], {
@@ -68,6 +69,8 @@ const AddPage = () => {
       notes: result.data.notes || undefined,
     } )
 
+    toast.success( "Media added successfully!" )
+
     setTitle( "" )
     setType( "" )
     setStatus( "" )
@@ -76,7 +79,7 @@ const AddPage = () => {
   }
 
   return (
-    <div className="mx-auto flex w-full flex-col gap-8 max-w-4xl rounded-lg">
+    <div className="mx-auto flex w-full flex-col gap-8 max-w-4xl rounded-lg pt-4">
       <div className="flex flex-col gap-2">
         <h1 className="font-sans text-3xl font-bold tracking-tight text-foreground">
           Add Media

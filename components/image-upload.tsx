@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ImageAdd01Icon, Loading03Icon, Tick01Icon } from "@hugeicons/core-free-icons";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 interface ImageUploadProps {
   id: string;
@@ -39,6 +40,7 @@ export default function ImageUpload( { id, type, title, onSuccess }: ImageUpload
       if ( res.ok ) {
         const data = await res.json();
         setStatus( "success" );
+        toast.success( "Cover updated successfully!" );
         if ( onSuccess ) onSuccess( data.path );
       } else {
         setStatus( "error" );
@@ -65,7 +67,7 @@ export default function ImageUpload( { id, type, title, onSuccess }: ImageUpload
           asChild
           variant="secondary"
           className={ cn(
-            "cursor-pointer transition-all",
+            "cursor-pointer transition-all shadow-sm hover:shadow-md h-10 w-32",
             status === "success" && "bg-green-100 text-green-700 hover:bg-green-200"
           ) }
           disabled={ uploading }
