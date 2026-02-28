@@ -73,7 +73,9 @@ export async function getAll(
   type: string,
   filter: string = "all",
   sortBy: string = "title",
-  sortDir: "ASC" | "DESC" = "ASC"
+  sortDir: "ASC" | "DESC" = "ASC",
+  page: number = 1,
+  limit: number = 20
 ) {
   let conditions = [ eq( media.type, type ) ];
 
@@ -93,7 +95,9 @@ export async function getAll(
     .select()
     .from( media )
     .where( and( ...conditions ) )
-    .orderBy( orderFn( orderColumn ) );
+    .orderBy( orderFn( orderColumn ) )
+    .limit( limit )
+    .offset( ( page - 1 ) * limit );
 }
 
 export async function updateMediaEntry( id: string, data: {
@@ -147,4 +151,42 @@ export async function getAllForSearch( type: string ) {
     .from( media )
     .where( eq( media.type, type ) )
     .orderBy( desc( media.updatedAt ) );
+}
+
+export async function seedDummyAnime() {
+  const dummyAnimeTitles = [
+    "Naruto",
+    "Bleach",
+    "One Piece",
+    "Death Note",
+    "Fullmetal Alchemist: Brotherhood",
+    "Attack on Titan",
+    "Steins;Gate",
+    "Hunter x Hunter",
+    "Cowboy Bebop",
+    "Neon Genesis Evangelion",
+    "Demon Slayer",
+    "Jujutsu Kaisen",
+    "My Hero Academia",
+    "Tokyo Ghoul",
+    "Sword Art Online",
+    "Mob Psycho 100",
+    "One Punch Man",
+    "Code Geass",
+    "Vinland Saga",
+    "Cyberpunk: Edgerunners",
+    "Frieren: Beyond Journey's End",
+    "Chainsaw Man",
+    "Dragon Ball Z",
+    "JoJo's Bizarre Adventure",
+    "Gurren Lagann"
+  ]
+
+  for ( const title of dummyAnimeTitles ) {
+    await addMediaEntry( {
+      title,
+      type: "anime",
+      status: "finished"
+    } )
+  }
 }
