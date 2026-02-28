@@ -1,10 +1,10 @@
-// fetch-covers.ts
 import { db } from "@/db";
 import { media } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { writeFileSync } from "fs";
 
-const JIKAN_BASE = "https://api.jikan.moe/v4";
+const MANGADEX_BASE = "https://api.mangadex.org";
+const COVER_BASE = "https://uploads.mangadex.org/covers";
 const UPLOAD_URL = "http://localhost:3001/api/upload";
 const FAILED_LOG = "./failed-covers.json";
 
@@ -12,14 +12,24 @@ async function sleep( ms: number ) {
   return new Promise( ( r ) => setTimeout( r, ms ) );
 }
 
-async function searchManga( title: string ) {
-  const res = await fetch( `${ JIKAN_BASE }/manga?q=${ encodeURIComponent( title ) }&limit=1` );
+async function searchMangaDex( title: string ): Promise<string | null> {
+  const res = await fetch(
+    `${ MANGADEX_BASE }/manga?title=${ encodeURIComponent( title ) }&limit=1&includes[]=cover_art`
+  );
   const json = await res.json();
-  return json.data?.[ 0 ] ?? null;
+  const manga = json.data?.[ 0 ];
+  if ( !manga ) return null;
+
+  const coverRel = manga.relationships.find( ( r: any ) => r.type === "cover_art" );
+  const fileName = coverRel?.attributes?.fileName;
+  if ( !fileName ) return null;
+
+  return `${ COVER_BASE }/${ manga.id }/${ fileName }`;
 }
 
 async function uploadCover( imageUrl: string, id: string, type: string, title: string ) {
   const imgRes = await fetch( imageUrl );
+  if ( !imgRes.ok ) return false;
   const blob = await imgRes.blob();
 
   const ext = imageUrl.split( "." ).pop()?.split( "?" )[ 0 ] ?? "jpg";
@@ -35,30 +45,18 @@ async function uploadCover( imageUrl: string, id: string, type: string, title: s
 
 async function main() {
   const allManga = await db.select().from( media ).where( eq( media.type, "manga" ) );
-  console.log( `Processing ${ allManga.length } manga entries...` );
+  const withoutCover = allManga;
+  console.log( `${ allManga.length } total, ${ withoutCover.length } without cover. Processing...` );
 
   const failed: string[] = [];
 
-  for ( const entry of allManga ) {
-    if ( entry.cover ) {
-      console.log( `Skipping "${ entry.title }" — already has cover` );
-      continue;
-    }
-
+  for ( const entry of withoutCover ) {
     try {
-      // Jikan rate limit is 3 req/sec, stay safe with 400ms delay
-      await sleep( 400 );
+      await sleep( 200 );
 
-      const result = await searchManga( entry.title );
-      if ( !result ) {
-        console.log( `Not found: "${ entry.title }"` );
-        failed.push( entry.title );
-        continue;
-      }
-
-      const imageUrl = result.images?.jpg?.large_image_url ?? result.images?.jpg?.image_url;
+      const imageUrl = await searchMangaDex( entry.title );
       if ( !imageUrl ) {
-        console.log( `No image for: "${ entry.title }"` );
+        console.log( `Not found: "${ entry.title }"` );
         failed.push( entry.title );
         continue;
       }
