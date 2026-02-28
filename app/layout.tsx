@@ -20,17 +20,17 @@ const items = [
   {
     label: 'Anime',
     bgImage: '/anime-bg.jpeg',
-    links: [ { label: 'View Anime', href: '/anime' }, { label: 'Search Anime', href: '/anime-search' } ],
+    links: [ { label: 'View Anime', href: '/media/anime' }, { label: 'Search Anime', href: '/anime-search' } ],
   },
   {
     label: 'Manga',
     bgImage: '/manga-bg.jpg',
-    links: [ { label: 'View Manga', href: '/manga' }, { label: 'Search Manga', href: '/manga-search' } ],
+    links: [ { label: 'View Manga', href: '/media/manga' }, { label: 'Search Manga', href: '/manga-search' } ],
   },
   {
     label: 'Games',
     bgImage: '/games-bg.jpg',
-    links: [ { label: 'View Games', href: '/games' }, { label: 'Search Games', href: '/games-search' } ],
+    links: [ { label: 'View Games', href: '/media/games' }, { label: 'Search Games', href: '/games-search' } ],
   }
 ];
 

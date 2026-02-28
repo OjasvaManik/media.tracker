@@ -1,14 +1,15 @@
 "use client"
 
-import React, { useEffect, useState } from "react"
+import React, { Suspense, useEffect, useState } from "react"
 import { useSearchParams } from "next/navigation"
 import { getAll, updateMediaEntry } from "@/actions/action.media"
 import { Spinner } from "@/components/ui/spinner"
 import { MediaFilter } from "@/components/media-filter"
 import { MediaCard } from "@/components/media-card"
 import { MediaDrawer } from "@/components/media-drawer"
+import { toast } from "sonner";
 
-export default function MediaGrid( { type }: { type: string } ) {
+function MediaGridContent( { type }: { type: string } ) {
   const [ items, setItems ] = useState<any[]>( [] )
   const [ loading, setLoading ] = useState( true )
   const [ selectedItem, setSelectedItem ] = useState<any | null>( null )
@@ -21,6 +22,7 @@ export default function MediaGrid( { type }: { type: string } ) {
   const sortDir = ( searchParams.get( 'sortDir' ) || 'ASC' ) as "ASC" | "DESC"
 
   useEffect( () => {
+    toast( type )
     setLoading( true )
     getAll( type, filter, sortBy, sortDir ).then( ( data ) => {
       setItems( data )
@@ -44,26 +46,25 @@ export default function MediaGrid( { type }: { type: string } ) {
   }
 
   const handleDeleteSuccess = ( deletedId: string ) => {
-    setItems( ( prev ) => prev.filter( ( item ) => item.id !== deletedId ) );
+    setItems( ( prev ) => prev.filter( ( item ) => item.id !== deletedId ) )
   }
 
   const sortedItems = [ ...items ].sort( ( a, b ) => {
-    if ( a.isFavorite === b.isFavorite ) return 0;
-    return a.isFavorite ? -1 : 1;
-  } );
+    if ( a.isFavorite === b.isFavorite ) return 0
+    return a.isFavorite ? -1 : 1
+  } )
 
   return (
     <div className="w-full">
       <MediaFilter/>
-
       { loading ? (
         <div className="flex justify-center py-8"><Spinner/></div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           { sortedItems.map( ( item ) => (
             <div key={ item.id } onClick={ () => {
-              setSelectedItem( item );
-              setEditData( item );
+              setSelectedItem( item )
+              setEditData( item )
             } }>
               <MediaCard item={ item } onDelete={ handleDeleteSuccess }/>
             </div>
@@ -75,8 +76,8 @@ export default function MediaGrid( { type }: { type: string } ) {
         selectedItem={ selectedItem }
         editData={ editData }
         onClose={ () => {
-          setSelectedItem( null );
-          setEditData( null );
+          setSelectedItem( null )
+          setEditData( null )
         } }
         onEditChange={ handleEditChange }
         onImageSuccess={ ( path ) => {
@@ -85,5 +86,13 @@ export default function MediaGrid( { type }: { type: string } ) {
         } }
       />
     </div>
+  )
+}
+
+export default function MediaGrid( props: { type: string } ) {
+  return (
+    <Suspense fallback={ <div className="flex justify-center py-8"><Spinner/></div> }>
+      <MediaGridContent { ...props } />
+    </Suspense>
   )
 }
