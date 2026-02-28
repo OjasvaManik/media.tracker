@@ -23,11 +23,12 @@ export async function POST( req: NextRequest ) {
       .limit( 1 );
 
     if ( existingMedia.length > 0 && existingMedia[ 0 ].cover ) {
-      const oldFilePath = path.join( process.cwd(), "public", existingMedia[ 0 ].cover );
+      // cover is stored as /uploads/manga/filename.jpg — strip leading slash to get the relative path
+      const oldFilePath = path.join( process.cwd(), existingMedia[ 0 ].cover.replace( /^\//, "" ) );
       try {
         await fs.unlink( oldFilePath );
       } catch ( err: any ) {
-        if ( err.code !== 'ENOENT' ) {
+        if ( err.code !== "ENOENT" ) {
           console.error( err );
         }
       }
@@ -38,8 +39,9 @@ export async function POST( req: NextRequest ) {
     const timestamp = Date.now();
     const fileName = `${ type }-${ safeTitle }-${ id }-${ timestamp }${ extension }`;
 
-    const relativePath = `/${ type }/${ fileName }`;
-    const absoluteDirectory = path.join( process.cwd(), "public", type );
+    // store in uploads/{type}/ instead of public/{type}/
+    const relativePath = `/uploads/${ type }/${ fileName }`;
+    const absoluteDirectory = path.join( process.cwd(), "uploads", type );
     const absolutePath = path.join( absoluteDirectory, fileName );
 
     await fs.mkdir( absoluteDirectory, { recursive: true } );
