@@ -29,9 +29,9 @@ export const MediaEditor = ( { data, onChange, onImageSuccess }: MediaEditorProp
       {/* Media Cover Section */ }
       <div className="w-full md:w-1/3 flex flex-col gap-4">
         <div
-          className="relative rounded-lg overflow-hidden bg-muted aspect-[3/5] w-1/2 mx-auto md:w-full border border-border shadow-md">
+          className="relative rounded-lg overflow-hidden bg-muted aspect-3/5 w-1/2 mx-auto md:w-full border border-border shadow-md">
           { data?.cover ? (
-            <Image src={ data.cover } alt={ data.title } fill className="object-cover" unoptimized/>
+            <Image src={ data.cover } alt={ data.title } fill className="object-cover"/>
           ) : (
             <div
               className="w-full h-full flex items-center justify-center text-muted-foreground italic text-xs md:text-base">No
@@ -152,7 +152,7 @@ export const MediaEditor = ( { data, onChange, onImageSuccess }: MediaEditorProp
               id="edit-notes"
               value={ data.notes || "" }
               onChange={ ( e ) => onChange( "notes", e.target.value ) }
-              className="min-h-[100px]"
+              className="min-h-25"
             />
             <InputGroupAddon align="block-start">
               <HugeiconsIcon icon={ Note01Icon } className="size-4 text-muted-foreground"/>

@@ -24,7 +24,7 @@ export const HomeMediaCard = ( { item, onDelete, onClick }: HomeMediaCardProps )
       { item.cover && (
         <div
           className="absolute right-0 top-0 bottom-0 w-3/5 opacity-50 group-hover:opacity-100 pointer-events-none transition-opacity">
-          <Image src={ item.cover } alt="" fill className="object-cover" unoptimized/>
+          <Image src={ item.cover } alt="" fill className="object-cover"/>
           <div className="absolute inset-0 bg-linear-to-r from-card via-card/80 to-transparent"/>
         </div>
       ) }

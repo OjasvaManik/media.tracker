@@ -7,7 +7,6 @@ import { Spinner } from "@/components/ui/spinner"
 import { MediaFilter } from "@/components/media-filter"
 import { MediaCard } from "@/components/media-card"
 import { MediaDrawer } from "@/components/media-drawer"
-import { toast } from "sonner";
 
 function MediaGridContent( { type }: { type: string } ) {
   const [ items, setItems ] = useState<any[]>( [] )
@@ -22,7 +21,6 @@ function MediaGridContent( { type }: { type: string } ) {
   const sortDir = ( searchParams.get( 'sortDir' ) || 'ASC' ) as "ASC" | "DESC"
 
   useEffect( () => {
-    toast( type )
     setLoading( true )
     getAll( type, filter, sortBy, sortDir ).then( ( data ) => {
       setItems( data )
