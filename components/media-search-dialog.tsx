@@ -34,7 +34,7 @@ export function MediaSearchDialog( { open, setOpen, defaultType }: MediaSearchDi
 
     const timer = setTimeout( async () => {
       setLoading( true )
-      const data = await getAllForSearch( defaultType, searchQuery )
+      const data = await getAllForSearch( defaultType )
       setItems( data )
       setLoading( false )
     }, 300 )
