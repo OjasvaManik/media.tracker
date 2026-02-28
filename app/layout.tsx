@@ -30,7 +30,7 @@ const items = [
   {
     label: 'Games',
     bgImage: '/games-bg.jpg',
-    links: [ { label: 'View Games', href: '/media/games' }, { label: 'Search Games', href: '/games-search' } ],
+    links: [ { label: 'View Games', href: '/media/game' }, { label: 'Search Games', href: '/games-search' } ],
   }
 ];
 
