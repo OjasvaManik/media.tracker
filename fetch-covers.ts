@@ -12,19 +12,31 @@ async function sleep( ms: number ) {
   return new Promise( ( r ) => setTimeout( r, ms ) );
 }
 
-async function searchMangaDex( title: string ): Promise<string | null> {
-  const res = await fetch(
-    `${ MANGADEX_BASE }/manga?title=${ encodeURIComponent( title ) }&limit=1&includes[]=cover_art`
-  );
-  const json = await res.json();
-  const manga = json.data?.[ 0 ];
-  if ( !manga ) return null;
+async function searchMangaDex( title: string, retries = 3 ): Promise<string | null> {
+  for ( let i = 0; i < retries; i++ ) {
+    try {
+      const res = await fetch(
+        `${ MANGADEX_BASE }/manga?title=${ encodeURIComponent( title ) }&limit=1&includes[]=cover_art`
+      );
+      const json = await res.json();
+      const manga = json.data?.[ 0 ];
+      if ( !manga ) return null;
 
-  const coverRel = manga.relationships.find( ( r: any ) => r.type === "cover_art" );
-  const fileName = coverRel?.attributes?.fileName;
-  if ( !fileName ) return null;
+      const coverRel = manga.relationships.find( ( r: any ) => r.type === "cover_art" );
+      const fileName = coverRel?.attributes?.fileName;
+      if ( !fileName ) return null;
 
-  return `${ COVER_BASE }/${ manga.id }/${ fileName }`;
+      return `${ COVER_BASE }/${ manga.id }/${ fileName }`;
+    } catch ( err ) {
+      if ( i < retries - 1 ) {
+        console.log( `Retrying "${ title }" (attempt ${ i + 2 })...` );
+        await sleep( 1000 * ( i + 1 ) ); // 1s, 2s, 3s backoff
+      } else {
+        throw err;
+      }
+    }
+  }
+  return null;
 }
 
 async function uploadCover( imageUrl: string, id: string, type: string, title: string ) {
