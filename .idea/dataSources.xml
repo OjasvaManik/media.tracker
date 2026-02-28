@@ -8,5 +8,12 @@
       <jdbc-url>jdbc:sqlite:C:\Users\ojasv\IdeaProjects\media.tracker\tracker.sqlite3</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
+    <data-source source="LOCAL" name="tracker.sqlite3 prod" uuid="ccbc5223-81c8-435d-88b3-8958665215d8">
+      <driver-ref>sqlite.xerial</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
+      <jdbc-url>jdbc:sqlite:\\100.106.44.114\ojasva\Prod\media.tracker\tracker.sqlite3</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
   </component>
 </project>

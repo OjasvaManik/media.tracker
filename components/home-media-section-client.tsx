@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react"
 import { HomeMediaCard } from "@/components/home-media-card"
 import { MediaDrawer } from "@/components/media-drawer"
 import { updateMediaEntry } from "@/actions/action.media"
-import { Separator } from "@/components/ui/separator";
+import { Separator } from "@/components/ui/separator"
 
 interface HomeMediaSectionClientProps {
   title: string
@@ -36,19 +36,23 @@ export const HomeMediaSectionClient = ( {
     const timer = setTimeout( async () => {
       await updateMediaEntry( editData.id, editData )
       setHasChanges( false )
-
-      const updateList = ( list: any[] ) => list.map( item => item.id === editData.id ? editData : item )
-      setFavs( updateList )
-      setAdds( updateList )
-      setUpds( updateList )
-      setFins( updateList )
     }, 1000 )
 
     return () => clearTimeout( timer )
   }, [ editData, hasChanges ] )
 
   const handleEditChange = ( field: string, value: any ) => {
-    setEditData( ( prev: any ) => ( { ...prev, [ field ]: value } ) )
+    setEditData( ( prev: any ) => {
+      const updatedData = { ...prev, [ field ]: value }
+
+      const updateList = ( list: any[] ) => list.map( item => item.id === updatedData.id ? updatedData : item )
+      setFavs( updateList )
+      setAdds( updateList )
+      setUpds( updateList )
+      setFins( updateList )
+
+      return updatedData
+    } )
     setHasChanges( true )
   }
 
@@ -104,11 +108,6 @@ export const HomeMediaSectionClient = ( {
         onEditChange={ handleEditChange }
         onImageSuccess={ ( path ) => {
           handleEditChange( "cover", path )
-          const updateList = ( list: any[] ) => list.map( i => i.id === editData.id ? { ...i, cover: path } : i )
-          setFavs( updateList )
-          setAdds( updateList )
-          setUpds( updateList )
-          setFins( updateList )
         } }
       />
     </div>

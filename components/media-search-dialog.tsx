@@ -10,7 +10,7 @@ import {
   CommandItem,
   CommandList
 } from "@/components/ui/command"
-import { getAllForSearch } from "@/actions/action.media"
+import { getAllForSearch, updateMediaEntry } from "@/actions/action.media"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { BookOpen01Icon, GameIcon, Tv01Icon } from "@hugeicons/core-free-icons"
 import { MediaDrawer } from "@/components/media-drawer"
@@ -24,21 +24,36 @@ interface MediaSearchDialogProps {
 export function MediaSearchDialog( { open, setOpen, defaultType }: MediaSearchDialogProps ) {
   const [ items, setItems ] = useState<any[]>( [] )
   const [ loading, setLoading ] = useState( false )
+  const [ searchQuery, setSearchQuery ] = useState( "" )
   const [ selectedItem, setSelectedItem ] = useState<any | null>( null )
   const [ editData, setEditData ] = useState<any | null>( null )
+  const [ hasChanges, setHasChanges ] = useState( false )
 
   useEffect( () => {
     if ( !open ) return
 
-    const fetchMedia = async () => {
+    const timer = setTimeout( async () => {
       setLoading( true )
-      const data = await getAllForSearch( defaultType )
+      const data = await getAllForSearch( defaultType, searchQuery )
       setItems( data )
       setLoading( false )
-    }
+    }, 300 )
 
-    fetchMedia()
-  }, [ open, defaultType ] )
+    return () => clearTimeout( timer )
+  }, [ open, defaultType, searchQuery ] )
+
+  useEffect( () => {
+    if ( !hasChanges || !editData ) return
+
+    const timer = setTimeout( async () => {
+      await updateMediaEntry( editData.id, editData )
+      setHasChanges( false )
+
+      setItems( ( prev ) => prev.map( item => item.id === editData.id ? editData : item ) )
+    }, 1000 )
+
+    return () => clearTimeout( timer )
+  }, [ editData, hasChanges ] )
 
   const getIcon = ( type: string ) => {
     if ( type === 'manga' ) return BookOpen01Icon
@@ -46,15 +61,23 @@ export function MediaSearchDialog( { open, setOpen, defaultType }: MediaSearchDi
     return GameIcon
   }
 
+  const handleEditChange = ( field: string, value: any ) => {
+    setEditData( ( prev: any ) => ( { ...prev, [ field ]: value } ) )
+    setHasChanges( true )
+  }
+
   return (
     <>
       <CommandDialog open={ open } onOpenChange={ setOpen }>
         <Command>
-          <CommandInput placeholder={ `Search ${ defaultType === 'all' ? 'media' : defaultType }...` }/>
+          <CommandInput
+            placeholder={ `Search ${ defaultType === 'all' ? 'media' : defaultType }...` }
+            value={ searchQuery }
+            onValueChange={ setSearchQuery }
+          />
           <CommandList>
             { loading && <CommandEmpty>Loading...</CommandEmpty> }
             { !loading && items.length === 0 && <CommandEmpty>No media found.</CommandEmpty> }
-            { !loading && items.length > 0 && <CommandEmpty>No results found.</CommandEmpty> }
 
             { !loading && items.length > 0 && (
               <CommandGroup heading="Results">
@@ -92,8 +115,11 @@ export function MediaSearchDialog( { open, setOpen, defaultType }: MediaSearchDi
           setSelectedItem( null )
           setEditData( null )
         } }
-        onEditChange={ ( field, value ) => setEditData( ( prev: any ) => ( { ...prev, [ field ]: value } ) ) }
-        onImageSuccess={ ( path ) => setEditData( ( prev: any ) => ( { ...prev, image: path } ) ) }
+        onEditChange={ handleEditChange }
+        onImageSuccess={ ( path ) => {
+          handleEditChange( "cover", path )
+          setItems( ( prev ) => prev.map( i => i.id === editData.id ? { ...i, cover: path } : i ) )
+        } }
       />
     </>
   )
