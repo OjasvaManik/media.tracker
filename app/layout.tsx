@@ -27,18 +27,30 @@ const items = [
   }
 ];
 
+// layout.tsx
+
 export default function RootLayout( {
                                       children,
                                     }: Readonly<{
   children: React.ReactNode;
 }> ) {
   return (
-    <html lang="en" className={ cn( outfit.className, 'dark p-4 bg-background text-foreground' ) }>
-    <body className={ `antialiased` }>
-    <CardNav items={ items } logo={ 'favicon.ico' } logoAlt={ 'Logo' } baseColor={ '#1c2e38' } menuColor={ '#f3e3ea' }
-             buttonBgColor={ '#c67b96' } buttonTextColor={ '#f3e3ea' } ease={ 'back.out' }/>
-    <div className={ 'absolute inset-0 flex flex-col gap-4 top-24 left-10' }>
-      { children }
+    <html lang="en" className={ cn( outfit.className, 'dark bg-background text-foreground' ) }>
+    <body className="antialiased relative min-h-screen">
+    <div className="p-4 w-full">
+      <CardNav
+        items={ items }
+        logo={ 'favicon.ico' }
+        logoAlt={ 'Logo' }
+        baseColor={ '#1c2e38' }
+        menuColor={ '#f3e3ea' }
+        buttonBgColor={ '#c67b96' }
+        buttonTextColor={ '#f3e3ea' }
+        ease={ 'back.out' }
+      />
+      <main className="mt-20 px-2 md:px-6 lg:mt-24">
+        { children }
+      </main>
     </div>
     </body>
     </html>
