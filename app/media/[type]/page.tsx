@@ -9,7 +9,7 @@ export default async function MediaPage( {
   const { type } = await params;
 
   return (
-    <div className='pt-4'>
+    <div className='md:pt-4'>
       <MediaGrid type={ type }/>
     </div>
   )

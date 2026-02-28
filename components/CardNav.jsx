@@ -6,7 +6,7 @@ import {GoArrowUpRight} from 'react-icons/go';
 import './CardNav.css';
 import Link from "next/link";
 import {Button} from "@/components/ui/button";
-import {MediaSearchDialog} from "@/components/media-search-dialog"; // Import the dialog
+import {MediaSearchDialog} from "@/components/media-search-dialog";
 
 const CardNav = ({
                      logo,
@@ -22,7 +22,6 @@ const CardNav = ({
     const [isHamburgerOpen, setIsHamburgerOpen] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
 
-    // Search State
     const [searchOpen, setSearchOpen] = useState(false);
     const [searchType, setSearchType] = useState('all');
 
@@ -136,13 +135,22 @@ const CardNav = ({
         }
     };
 
-    const closeMenu = () => {
-        if (!isExpanded) return;
+    const closeMenu = (onComplete) => {
+        if (!isExpanded) {
+            if (typeof onComplete === 'function') onComplete();
+            return;
+        }
         const tl = tlRef.current;
-        if (!tl) return;
+        if (!tl) {
+            if (typeof onComplete === 'function') onComplete();
+            return;
+        }
 
         setIsHamburgerOpen(false);
-        tl.eventCallback('onReverseComplete', () => setIsExpanded(false));
+        tl.eventCallback('onReverseComplete', () => {
+            setIsExpanded(false);
+            if (typeof onComplete === 'function') onComplete();
+        });
         tl.reverse();
     };
 
@@ -152,8 +160,9 @@ const CardNav = ({
 
     const openSearch = (type) => {
         setSearchType(type.toLowerCase());
-        setSearchOpen(true);
-        closeMenu();
+        closeMenu(() => {
+            setSearchOpen(true);
+        });
     }
 
     return (
@@ -211,12 +220,11 @@ const CardNav = ({
                             <div className="nav-card-label relative z-10">{item.label}</div>
                             <div className="nav-card-links relative z-10">
                                 {item.links?.map((lnk, i) => {
-                                    // Check if the link is meant for search
                                     if (lnk.href.includes('search')) {
                                         return (
                                             <button
                                                 key={`${lnk.label}-${i}`}
-                                                className="nav-card-link text-left w-full flex items-center bg-transparent border-none p-0 cursor-pointer text-[inherit] font-[inherit]"
+                                                className="nav-card-link text-left w-full flex items-center bg-transparent border-none p-0 cursor-pointer text-inherit font-[inherit]"
                                                 onClick={() => openSearch(item.label)}
                                                 aria-label={lnk.ariaLabel}
                                             >
@@ -245,7 +253,6 @@ const CardNav = ({
                 </div>
             </nav>
 
-            {/* Render the search dialog alongside the Nav */}
             <MediaSearchDialog
                 open={searchOpen}
                 setOpen={setSearchOpen}

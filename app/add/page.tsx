@@ -79,7 +79,7 @@ const AddPage = () => {
   }
 
   return (
-    <div className="mx-auto flex w-full flex-col gap-8 max-w-4xl rounded-lg pt-4">
+    <div className="mx-auto flex w-full flex-col gap-8 max-w-4xl rounded-lg md:pt-4">
       <div className="flex flex-col gap-2">
         <h1 className="font-sans text-3xl font-bold tracking-tight text-foreground">
           Add Media
