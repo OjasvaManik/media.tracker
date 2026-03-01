@@ -7,6 +7,7 @@ import './CardNav.css';
 import Link from "next/link";
 import {Button} from "@/components/ui/button";
 import {MediaSearchDialog} from "@/components/media-search-dialog";
+import {ThemeToggle} from "@/components/theme-toggle";
 
 const CardNav = ({
                      logo,
@@ -187,16 +188,20 @@ const CardNav = ({
                         </Link>
                     </div>
 
-                    <Button
-                        type="button"
-                        className="card-nav-cta-button uppercase"
-                        style={{backgroundColor: buttonBgColor, color: buttonTextColor}}
-                        asChild
-                    >
-                        <Link href={'/add'} onClick={closeMenu}>
-                            Add Title
-                        </Link>
-                    </Button>
+                    <div className="flex items-center justify-end gap-4 h-full">
+                        <ThemeToggle/>
+
+                        <Button
+                            type="button"
+                            className="card-nav-cta-button uppercase h-10"
+                            style={{backgroundColor: buttonBgColor, color: buttonTextColor}}
+                            asChild
+                        >
+                            <Link href={'/add'} onClick={closeMenu}>
+                                Add Title
+                            </Link>
+                        </Button>
+                    </div>
                 </div>
 
                 <div className="card-nav-content" aria-hidden={!isExpanded}>

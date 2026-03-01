@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import CardNav from "@/components/CardNav";
 import React from "react";
 import { Toaster } from "@/components/ui/sonner"
+import { ThemeProvider } from "@/components/theme-provider"
 
 const outfit = Outfit( { subsets: [ 'latin' ], variable: '--font-sans' } );
 
@@ -40,8 +41,14 @@ export default function RootLayout( {
   children: React.ReactNode;
 }> ) {
   return (
-    <html lang="en" className={ cn( outfit.className, 'dark bg-background text-foreground' ) }>
+    <html lang="en" className={ cn( outfit.className, 'bg-background text-foreground' ) } suppressHydrationWarning>
     <body className="antialiased relative min-h-screen">
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="system"
+      enableSystem
+      disableTransitionOnChange
+    >
     <CardNav
       items={ items }
       logo={ '/icon.png' }
@@ -56,6 +63,7 @@ export default function RootLayout( {
       { children }
       <Toaster/>
     </main>
+    </ThemeProvider>
     </body>
     </html>
   );
